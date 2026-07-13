@@ -1,0 +1,22 @@
+{
+  "name": "Just The Tip",
+  "short_name": "Tip",
+  "description": "A simple, offline tip calculator with a classic Mac OS 7 look.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#008080",
+  "theme_color": "#c0c0c0",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
