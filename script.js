@@ -14,8 +14,13 @@ const saveSettings = document.getElementById("saveSettings");
 const doneButton = document.getElementById("doneButton");
 
 
+let savedTip =
+    localStorage.getItem("defaultTip");
+
 let selectedPercent =
-    parseInt(localStorage.getItem("defaultTip")) || 20;
+    savedTip !== null
+        ? parseInt(savedTip)
+        : 20;
 
 
 let selectedAmount = 0;
