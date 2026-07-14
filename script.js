@@ -501,6 +501,26 @@ billInput.addEventListener("input",()=>{
 
 });
 
+billInput.addEventListener("keydown", (event) => {
+
+    if (event.key === "Enter" || event.key === "Tab") {
+
+        event.preventDefault();
+
+        billInput.blur();
+
+        selectedAmount =
+            calculateAmountFromPercent(selectedPercent);
+
+        updateDisplay();
+
+        updateDollarWheelPosition();
+        updatePercentWheelPosition();
+
+    }
+
+});
+
 
 
 watchWheel(percentWheel,(item)=>{
