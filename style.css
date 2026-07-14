@@ -55,17 +55,47 @@ body {
 
 .titlebar {
 
-    background: var(--title);
+    background:var(--title);
 
-    border-bottom: 4px solid #000;
+    border-bottom:4px solid #000;
 
-    padding: 6px 10px;
+    padding:6px 10px;
 
     display:flex;
+
     align-items:center;
-    justify-content:space-between;
+
+    gap:12px;
 
     font-size:24px;
+
+}
+
+
+.titlebar::before,
+.titlebar::after {
+
+    content:"";
+
+    flex:1;
+
+    height:22px;
+
+    background-image:repeating-linear-gradient(
+        to bottom,
+        #000 0,
+        #000 2px,
+        transparent 2px,
+        transparent 5px
+    );
+
+}
+
+
+.titlebar span {
+
+    text-align:center;
+
 }
 
 
