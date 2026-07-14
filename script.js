@@ -13,6 +13,8 @@ const defaultTipSelect = document.getElementById("defaultTip");
 const saveSettings = document.getElementById("saveSettings");
 const doneButton = document.getElementById("doneButton");
 
+const cancelSettings = document.getElementById("cancelSettings");
+
 
 let savedTip =
     localStorage.getItem("defaultTip");
@@ -495,15 +497,15 @@ function watchWheel(wheel, callback) {
 
 billInput.addEventListener("input",()=>{
 
-
     selectedAmount =
         calculateAmountFromPercent(
             selectedPercent
         );
 
-
     updateDisplay();
 
+    updateDollarWheelPosition();
+    updatePercentWheelPosition();
 
 });
 
@@ -620,7 +622,11 @@ saveSettings.onclick = ()=>{
 
 };
 
+cancelSettings.onclick = ()=>{
 
+    settingsDialog.close();
+
+};
 
 // ------------------------------
 // Startup
