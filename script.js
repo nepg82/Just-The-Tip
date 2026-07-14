@@ -181,6 +181,9 @@ function calculateAmountFromPercent(percent) {
     const bill =
         parseFloat(billInput.value) || 0;
 
+    if (bill > 10000) {
+        return 0;
+    }
 
     return bill * percent / 100;
 
@@ -293,7 +296,10 @@ function updateDollarWheelPosition() {
 
     let distance = Infinity;
 
-
+    if (!Number.isFinite(selectedAmount)) {
+        selectedAmount = 0;
+    }
+    
     [...dollarWheel.children].forEach((item,index)=>{
 
 
