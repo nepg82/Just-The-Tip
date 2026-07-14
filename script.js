@@ -580,31 +580,24 @@ settingsButton.onclick = ()=>{
 };
 
 
-
 saveSettings.onclick = ()=>{
-
 
     selectedPercent =
         parseInt(defaultTipSelect.value);
-
-
 
     localStorage.setItem(
         "defaultTip",
         selectedPercent
     );
 
-
-
     selectedAmount =
         calculateAmountFromPercent(
             selectedPercent
         );
 
-
     updateDollarWheelPosition();
-
     updateDisplay();
+    settingsDialog.close();
 
 
 };
