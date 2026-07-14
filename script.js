@@ -1,196 +1,621 @@
 const billInput = document.getElementById("billAmount");
-const wheel = document.getElementById("tipWheel");
+
+const percentWheel = document.getElementById("percentWheel");
+const dollarWheel = document.getElementById("dollarWheel");
 
 const tipValue = document.getElementById("tipValue");
 const totalValue = document.getElementById("totalValue");
 
 const settingsButton = document.getElementById("settingsButton");
 const settingsDialog = document.getElementById("settingsDialog");
+
 const defaultTipSelect = document.getElementById("defaultTip");
 const saveSettings = document.getElementById("saveSettings");
 
-let selectedTip = parseInt(localStorage.getItem("defaultTip")) || 20;
+
+let selectedPercent =
+    parseInt(localStorage.getItem("defaultTip")) || 20;
+
+
+let selectedAmount = 0;
+
+let updatingWheel = false;
+
 
 
 // ------------------------------
-// Build Settings List
+// Settings Dropdown
 // ------------------------------
 
 for (let i = 0; i <= 50; i++) {
+
     const option = document.createElement("option");
+
     option.value = i;
     option.textContent = `${i}%`;
-    if (i === selectedTip) option.selected = true;
+
+    if (i === selectedPercent) {
+        option.selected = true;
+    }
+
     defaultTipSelect.appendChild(option);
+
 }
 
 
+
 // ------------------------------
-// Build Tip Wheel
+// Build Percentage Wheel
 // ------------------------------
 
-function buildWheel() {
+function buildPercentWheel() {
 
-    wheel.innerHTML = "";
+    percentWheel.innerHTML = "";
 
-    const bill = parseFloat(billInput.value) || 0;
 
     for (let i = 0; i <= 50; i++) {
 
         const item = document.createElement("div");
+
         item.className = "tipItem";
-        item.dataset.tip = i;
+
+        item.dataset.value = i;
+
 
         item.innerHTML = `
-            <div class="tipPercent">${i}%</div>
-            <div class="tipDollar">$${(bill * i / 100).toFixed(2)}</div>
+            <div class="tipPrimary">${i}%</div>
+            <div class="tipSecondary">
+                $0.00
+            </div>
         `;
 
+
         item.onclick = () => {
-            selectedTip = i;
-            highlightSelection();
-            calculate();
-            item.scrollIntoView({
-                behavior: "smooth",
-                inline: "center",
-                block: "nearest"
-            });
+
+            if (updatingWheel) return;
+
+
+            selectedPercent = i;
+
+            selectedAmount =
+                calculateAmountFromPercent(i);
+
+
+            updateDollarWheelPosition();
+
+            updateDisplay();
+
+            highlight(percentWheel);
+
         };
 
-        wheel.appendChild(item);
+
+        percentWheel.appendChild(item);
+
     }
 
-    highlightSelection();
+}
 
-    requestAnimationFrame(() => {
-        wheel.children[selectedTip].scrollIntoView({
-            behavior: "instant",
-            inline: "center",
-            block: "nearest"
-        });
-    });
+
+
+// ------------------------------
+// Build Dollar Wheel
+// ------------------------------
+
+function buildDollarWheel() {
+
+    dollarWheel.innerHTML = "";
+
+
+    for (let cents = 0; cents <= 5000; cents += 25) {
+
+
+        const amount =
+            cents / 100;
+
+
+        const item = document.createElement("div");
+
+
+        item.className = "tipItem";
+
+
+        item.dataset.value = amount;
+
+
+
+        item.innerHTML = `
+            <div class="tipPrimary">
+                $${amount.toFixed(2)}
+            </div>
+            <div class="tipSecondary">
+                0%
+            </div>
+        `;
+
+
+
+        item.onclick = () => {
+
+            if (updatingWheel) return;
+
+
+            selectedAmount = amount;
+
+            selectedPercent =
+                calculatePercentFromAmount(amount);
+
+
+            updatePercentWheelPosition();
+
+            updateDisplay();
+
+            highlight(dollarWheel);
+
+        };
+
+
+
+        dollarWheel.appendChild(item);
+
+    }
 
 }
 
-buildWheel();
 
 
 // ------------------------------
-// Highlight
+// Calculations
 // ------------------------------
 
-function highlightSelection() {
+function calculateAmountFromPercent(percent) {
 
-    [...wheel.children].forEach(child =>
-        child.classList.remove("selected")
+    const bill =
+        parseFloat(billInput.value) || 0;
+
+
+    return bill * percent / 100;
+
+}
+
+
+
+function calculatePercentFromAmount(amount) {
+
+    const bill =
+        parseFloat(billInput.value) || 0;
+
+
+    if (bill === 0) return 0;
+
+
+    return Math.round(
+        amount / bill * 100
     );
 
-    wheel.children[selectedTip].classList.add("selected");
 }
 
 
+
 // ------------------------------
-// Calculate
+// Update Wheels
 // ------------------------------
 
-function calculate() {
+function updateDollarWheelValues() {
 
-    const bill = parseFloat(billInput.value) || 0;
+    const bill =
+        parseFloat(billInput.value) || 0;
 
-    const tip = bill * selectedTip / 100;
 
-    tipValue.textContent = `$${tip.toFixed(2)}`;
-    totalValue.textContent = `$${(bill + tip).toFixed(2)}`;
 
-    [...wheel.children].forEach(item => {
+    [...dollarWheel.children].forEach(item => {
 
-        const pct = parseInt(item.dataset.tip);
+        const amount =
+            parseFloat(item.dataset.value);
 
-        item.querySelector(".tipDollar").textContent =
-            `$${(bill * pct / 100).toFixed(2)}`;
+
+        item.querySelector(".tipSecondary")
+            .textContent =
+            bill
+            ? `${Math.round(amount / bill * 100)}%`
+            : "0%";
 
     });
 
+
+
 }
+
+
+
+function updatePercentWheelValues() {
+
+
+    [...percentWheel.children].forEach(item => {
+
+
+        const percent =
+            parseInt(item.dataset.value);
+
+
+        item.querySelector(".tipSecondary")
+            .textContent =
+            `$${calculateAmountFromPercent(percent).toFixed(2)}`;
+
+
+    });
+
+
+}
+
+
+
+function updatePercentWheelPosition() {
+
+
+    const target =
+        percentWheel.children[selectedPercent];
+
+
+    if (!target) return;
+
+
+    target.scrollIntoView({
+
+        behavior:"smooth",
+
+        inline:"center",
+
+        block:"nearest"
+
+    });
+
+
+}
+
+
+
+function updateDollarWheelPosition() {
+
+
+    let closest = 0;
+
+    let distance = Infinity;
+
+
+    [...dollarWheel.children].forEach((item,index)=>{
+
+
+        const value =
+            parseFloat(item.dataset.value);
+
+
+        const difference =
+            Math.abs(value - selectedAmount);
+
+
+        if (difference < distance) {
+
+            distance = difference;
+
+            closest = index;
+
+        }
+
+    });
+
+
+
+    dollarWheel.children[closest]
+        .scrollIntoView({
+
+            behavior:"smooth",
+
+            inline:"center",
+
+            block:"nearest"
+
+        });
+
+
+}
+
+
+
+// ------------------------------
+// Display
+// ------------------------------
+
+function updateDisplay() {
+
+
+    const tip =
+        selectedAmount;
+
+
+    const bill =
+        parseFloat(billInput.value) || 0;
+
+
+
+    tipValue.textContent =
+        `$${tip.toFixed(2)}`;
+
+
+    totalValue.textContent =
+        `$${(bill + tip).toFixed(2)}`;
+
+
+    updatePercentWheelValues();
+
+    updateDollarWheelValues();
+
+}
+
+
+
+function highlight(wheel) {
+
+
+    [...wheel.children].forEach(item =>
+        item.classList.remove("selected")
+    );
+
+
+
+    let closest = 0;
+
+    let distance = Infinity;
+
+
+    const center =
+        wheel.scrollLeft + wheel.offsetWidth / 2;
+
+
+
+    [...wheel.children].forEach((item,index)=>{
+
+
+        const itemCenter =
+            item.offsetLeft + item.offsetWidth / 2;
+
+
+        const difference =
+            Math.abs(center - itemCenter);
+
+
+
+        if (difference < distance) {
+
+            distance = difference;
+
+            closest = index;
+
+        }
+
+    });
+
+
+
+    wheel.children[closest]
+        .classList.add("selected");
+
+}
+
 
 
 // ------------------------------
 // Wheel Scrolling
 // ------------------------------
 
-let scrollTimer;
+function watchWheel(wheel, callback) {
 
-wheel.addEventListener("scroll", () => {
 
-    clearTimeout(scrollTimer);
+    let timer;
 
-    scrollTimer = setTimeout(() => {
 
-        const center =
-            wheel.scrollLeft + wheel.offsetWidth / 2;
+    wheel.addEventListener("scroll",()=>{
 
-        let nearest = 0;
-        let distance = Infinity;
 
-        [...wheel.children].forEach((item, index) => {
+        clearTimeout(timer);
 
-            const itemCenter =
-                item.offsetLeft + item.offsetWidth / 2;
 
-            const d = Math.abs(center - itemCenter);
 
-            if (d < distance) {
-                distance = d;
-                nearest = index;
-            }
+        timer=setTimeout(()=>{
 
-        });
 
-        selectedTip = nearest;
+            if (updatingWheel)
+                return;
 
-        highlightSelection();
-        calculate();
 
-    }, 75);
+
+            const center =
+                wheel.scrollLeft +
+                wheel.offsetWidth / 2;
+
+
+
+            let closest = 0;
+
+            let distance = Infinity;
+
+
+
+            [...wheel.children]
+            .forEach((item,index)=>{
+
+
+                const itemCenter =
+                    item.offsetLeft +
+                    item.offsetWidth / 2;
+
+
+
+                const difference =
+                    Math.abs(center-itemCenter);
+
+
+
+                if(difference < distance){
+
+                    distance=difference;
+                    closest=index;
+
+                }
+
+
+            });
+
+
+
+            callback(
+                wheel.children[closest]
+            );
+
+
+        },100);
+
+
+    });
+
+
+}
+
+
+
+// ------------------------------
+// Events
+// ------------------------------
+
+billInput.addEventListener("input",()=>{
+
+
+    selectedAmount =
+        calculateAmountFromPercent(
+            selectedPercent
+        );
+
+
+    updateDisplay();
+
 
 });
 
 
+
+watchWheel(percentWheel,(item)=>{
+
+
+    selectedPercent =
+        parseInt(item.dataset.value);
+
+
+    selectedAmount =
+        calculateAmountFromPercent(
+            selectedPercent
+        );
+
+
+    updateDollarWheelPosition();
+
+    updateDisplay();
+
+});
+
+
+
+watchWheel(dollarWheel,(item)=>{
+
+
+    selectedAmount =
+        parseFloat(item.dataset.value);
+
+
+    selectedPercent =
+        calculatePercentFromAmount(
+            selectedAmount
+        );
+
+
+    updatePercentWheelPosition();
+
+    updateDisplay();
+
+});
+
+
+
+
 // ------------------------------
-// Bill Changed
+// Preferences
 // ------------------------------
 
-billInput.addEventListener("input", calculate);
+settingsButton.onclick = ()=>{
 
+    defaultTipSelect.value =
+        selectedPercent;
 
-// ------------------------------
-// Settings
-// ------------------------------
-
-settingsButton.onclick = () => {
-
-    defaultTipSelect.value = selectedTip;
     settingsDialog.showModal();
 
 };
 
-saveSettings.onclick = () => {
 
-    selectedTip = parseInt(defaultTipSelect.value);
 
-    localStorage.setItem("defaultTip", selectedTip);
+saveSettings.onclick = ()=>{
 
-    highlightSelection();
-    calculate();
 
-    wheel.children[selectedTip].scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest"
-    });
+    selectedPercent =
+        parseInt(defaultTipSelect.value);
+
+
+
+    localStorage.setItem(
+        "defaultTip",
+        selectedPercent
+    );
+
+
+
+    selectedAmount =
+        calculateAmountFromPercent(
+            selectedPercent
+        );
+
+
+    updateDollarWheelPosition();
+
+    updateDisplay();
+
 
 };
 
-calculate();
+
+
+// ------------------------------
+// Startup
+// ------------------------------
+
+buildPercentWheel();
+
+buildDollarWheel();
+
+
+selectedAmount =
+    calculateAmountFromPercent(
+        selectedPercent
+    );
+
+
+updateDisplay();
+
+
+setTimeout(()=>{
+
+    updatePercentWheelPosition();
+
+    updateDollarWheelPosition();
+
+},100);
+
 
 billInput.focus();
