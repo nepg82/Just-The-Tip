@@ -89,8 +89,8 @@ function buildPercentWheel() {
                 calculateAmountFromPercent(i);
 
 
+            updatePercentWheelPosition();
             updateDollarWheelPosition();
-
             updateDisplay();
 
             highlight(percentWheel);
@@ -260,13 +260,12 @@ function updatePercentWheelValues() {
 
 function updatePercentWheelPosition() {
 
-
     const target =
         percentWheel.children[selectedPercent];
 
-
     if (!target) return;
 
+    updatingWheel = true;
 
     target.scrollIntoView({
 
@@ -278,13 +277,17 @@ function updatePercentWheelPosition() {
 
     });
 
+    setTimeout(()=>{
+
+        updatingWheel = false;
+
+    },300);
 
 }
 
 
 
 function updateDollarWheelPosition() {
-
 
     let closest = 0;
 
@@ -313,6 +316,7 @@ function updateDollarWheelPosition() {
     });
 
 
+    updatingWheel = true;
 
     dollarWheel.children[closest]
         .scrollIntoView({
@@ -325,6 +329,12 @@ function updateDollarWheelPosition() {
 
         });
 
+
+    setTimeout(()=>{
+
+        updatingWheel = false;
+
+    },300);
 
 }
 
