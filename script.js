@@ -11,6 +11,7 @@ const settingsDialog = document.getElementById("settingsDialog");
 
 const defaultTipSelect = document.getElementById("defaultTip");
 const saveSettings = document.getElementById("saveSettings");
+const doneButton = document.getElementById("doneButton");
 
 
 let selectedPercent =
@@ -521,7 +522,19 @@ billInput.addEventListener("keydown", (event) => {
 
 });
 
+doneButton.onclick = ()=>{
 
+    billInput.blur();
+
+    selectedAmount =
+        calculateAmountFromPercent(selectedPercent);
+
+    updateDisplay();
+
+    updateDollarWheelPosition();
+    updatePercentWheelPosition();
+
+};
 
 watchWheel(percentWheel,(item)=>{
 
