@@ -93,8 +93,6 @@ function buildPercentWheel() {
             updateDollarWheelPosition();
             updateDisplay();
 
-            highlight(percentWheel);
-
         };
 
 
@@ -158,7 +156,7 @@ function buildDollarWheel() {
 
             updateDisplay();
 
-            highlight(dollarWheel);
+            highlight(dollarWheel, cents / 25);
 
         };
 
@@ -280,6 +278,8 @@ function updatePercentWheelPosition() {
 
     });
 
+    highlight(percentWheel, selectedPercent);
+
     setTimeout(()=>{
 
         updatingWheel = false;
@@ -336,6 +336,8 @@ function updateDollarWheelPosition() {
         });
 
 
+    highlight(dollarWheel, closest);
+
     setTimeout(()=>{
 
         updatingWheel = false;
@@ -378,51 +380,17 @@ function updateDisplay() {
 
 
 
-function highlight(wheel) {
-
+function highlight(wheel, index) {
 
     [...wheel.children].forEach(item =>
         item.classList.remove("selected")
     );
 
+    const target = wheel.children[index];
 
-
-    let closest = 0;
-
-    let distance = Infinity;
-
-
-    const center =
-        wheel.scrollLeft + wheel.offsetWidth / 2;
-
-
-
-    [...wheel.children].forEach((item,index)=>{
-
-
-        const itemCenter =
-            item.offsetLeft + item.offsetWidth / 2;
-
-
-        const difference =
-            Math.abs(center - itemCenter);
-
-
-
-        if (difference < distance) {
-
-            distance = difference;
-
-            closest = index;
-
-        }
-
-    });
-
-
-
-    wheel.children[closest]
-        .classList.add("selected");
+    if (target) {
+        target.classList.add("selected");
+    }
 
 }
 
@@ -493,7 +461,8 @@ function watchWheel(wheel, callback) {
 
 
             callback(
-                wheel.children[closest]
+                wheel.children[closest],
+                closest
             );
 
 
@@ -559,7 +528,7 @@ doneButton.onclick = ()=>{
 
 };
 
-watchWheel(percentWheel,(item)=>{
+watchWheel(percentWheel,(item, index)=>{
 
 
     selectedPercent =
@@ -576,11 +545,13 @@ watchWheel(percentWheel,(item)=>{
 
     updateDisplay();
 
+    highlight(percentWheel, index);
+
 });
 
 
 
-watchWheel(dollarWheel,(item)=>{
+watchWheel(dollarWheel,(item, index)=>{
 
 
     selectedAmount =
@@ -596,6 +567,8 @@ watchWheel(dollarWheel,(item)=>{
     updatePercentWheelPosition();
 
     updateDisplay();
+
+    highlight(dollarWheel, index);
 
 });
 
@@ -631,6 +604,7 @@ saveSettings.onclick = ()=>{
             selectedPercent
         );
 
+    updatePercentWheelPosition();
     updateDollarWheelPosition();
     updateDisplay();
     settingsDialog.close();
