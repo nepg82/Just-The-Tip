@@ -489,7 +489,19 @@ function watchWheel(wheel, callback) {
 // Events
 // ------------------------------
 
-billInput.addEventListener("input",()=>{
+billInput.addEventListener("input", () => {
+
+    // Keep only digits
+    let digits = billInput.value.replace(/\D/g, "");
+
+    // Empty field
+    if (digits === "") {
+        billInput.value = "";
+    } else {
+        // Interpret as cents
+        const amount = (parseInt(digits, 10) / 100).toFixed(2);
+        billInput.value = amount;
+    }
 
     selectedAmount =
         calculateAmountFromPercent(
