@@ -542,9 +542,7 @@ watchWheel(percentWheel,(item, index)=>{
 
     activeWheel = "percent";
     clearHighlight(dollarWheel);
-    selectedPercent = parseInt(defaultTipSelect.value);
-
-//    selectedPercent = parseInt(item.dataset.value);
+    selectedPercent = parseInt(item.dataset.value);
 
     selectedAmount =
         calculateAmountFromPercent(
