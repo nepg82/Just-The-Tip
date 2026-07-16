@@ -107,13 +107,14 @@ function buildPercentWheel() {
 // Build Dollar Wheel
 // ------------------------------
 
-function buildDollarWheel() {
-
+function buildDollarWheel(maxAmount = 50) {
+    
     dollarWheel.innerHTML = "";
 
 
-    for (let cents = 0; cents <= 5000; cents += 25) {
+    const maxCents = Math.round(maxAmount * 100);
 
+    for (let cents = 0; cents <= maxCents; cents += 25) {
 
         const amount =
             cents / 100;
