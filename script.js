@@ -24,12 +24,9 @@ let selectedPercent =
         ? parseInt(savedTip)
         : 20;
 
-
 let selectedAmount = 0;
-
 let updatingWheel = false;
-
-
+let activeWheel = "percent";
 
 // ------------------------------
 // Settings Dropdown
@@ -82,6 +79,8 @@ function buildPercentWheel() {
 
             if (updatingWheel) return;
 
+            activeWheel = "percent";
+            clearHighlight(dollarWheel);
 
             selectedPercent = i;
 
@@ -145,9 +144,11 @@ function buildDollarWheel() {
 
             if (updatingWheel) return;
 
+            
+    activeWheel = "dollar";
+            clearHighlight(percentWheel);
 
             selectedAmount = amount;
-
             selectedPercent =
                 calculatePercentFromAmount(amount);
 
@@ -278,7 +279,9 @@ function updatePercentWheelPosition() {
 
     });
 
-    highlight(percentWheel, selectedPercent);
+   if (activeWheel === "percent") {
+        highlight(percentWheel, selectedPercent);
+    }
 
     setTimeout(()=>{
 
@@ -336,8 +339,9 @@ function updateDollarWheelPosition() {
         });
 
 
-    highlight(dollarWheel, closest);
-
+    if (activeWheel === "dollar") {
+        highlight(dollarWheel, closest);
+    }
     setTimeout(()=>{
 
         updatingWheel = false;
@@ -394,6 +398,11 @@ function highlight(wheel, index) {
 
 }
 
+function clearHighlight(wheel) {
+    [...wheel.children].forEach(item =>
+        item.classList.remove("selected")
+    );
+}
 
 
 // ------------------------------
@@ -531,9 +540,11 @@ doneButton.onclick = ()=>{
 watchWheel(percentWheel,(item, index)=>{
 
 
-    selectedPercent =
-        parseInt(item.dataset.value);
+    activeWheel = "percent";
+    clearHighlight(dollarWheel);
+    selectedPercent = parseInt(defaultTipSelect.value);
 
+//    selectedPercent = parseInt(item.dataset.value);
 
     selectedAmount =
         calculateAmountFromPercent(
@@ -554,9 +565,10 @@ watchWheel(percentWheel,(item, index)=>{
 watchWheel(dollarWheel,(item, index)=>{
 
 
-    selectedAmount =
-        parseFloat(item.dataset.value);
+    activeWheel = "dollar";
+    clearHighlight(percentWheel);
 
+    selectedAmount = parseFloat(item.dataset.value);
 
     selectedPercent =
         calculatePercentFromAmount(
@@ -591,6 +603,9 @@ settingsButton.onclick = ()=>{
 
 saveSettings.onclick = ()=>{
 
+    activeWheel = "percent";
+    clearHighlight(dollarWheel);
+    
     selectedPercent =
         parseInt(defaultTipSelect.value);
 
