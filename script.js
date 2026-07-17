@@ -683,7 +683,10 @@ cancelSettings.onclick = ()=>{
 
 buildPercentWheel();
 
-buildDollarWheel();
+currentDollarWheelMax =
+    getDollarWheelMaximum();
+
+buildDollarWheel(currentDollarWheelMax);
 
 
 selectedAmount =
