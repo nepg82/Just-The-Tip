@@ -206,7 +206,17 @@ function calculatePercentFromAmount(amount) {
 
 }
 
+function getDollarWheelMaximum() {
 
+    const bill =
+        parseFloat(billInput.value) || 0;
+
+    return Math.max(
+        50,
+        Math.ceil((bill * 0.5) / 25) * 25
+    );
+
+}
 
 // ------------------------------
 // Update Wheels
