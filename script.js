@@ -28,6 +28,8 @@ let selectedAmount = 0;
 let updatingWheel = false;
 let activeWheel = "percent";
 
+let currentDollarWheelMax = 50;
+
 // ------------------------------
 // Settings Dropdown
 // ------------------------------
@@ -211,10 +213,29 @@ function getDollarWheelMaximum() {
     const bill =
         parseFloat(billInput.value) || 0;
 
-    return Math.max(
-        50,
-        Math.ceil((bill * 0.5) / 25) * 25
-    );
+    const halfBill =
+        bill * 0.5;
+
+    if (halfBill <= 50) {
+        return 50;
+    }
+
+    return Math.ceil(halfBill / 25) * 25;
+
+}
+
+function rebuildDollarWheel() {
+
+    const newMax =
+        getDollarWheelMaximum();
+
+    if (newMax === currentDollarWheelMax) {
+        return;
+    }
+
+    currentDollarWheelMax = newMax;
+
+    buildDollarWheel(newMax);
 
 }
 
@@ -514,15 +535,17 @@ billInput.addEventListener("input", () => {
         billInput.value = amount;
     }
 
-    selectedAmount =
-        calculateAmountFromPercent(
-            selectedPercent
-        );
+rebuildDollarWheel();
 
-    updateDisplay();
+selectedAmount =
+    calculateAmountFromPercent(
+        selectedPercent
+    );
 
-    updateDollarWheelPosition();
-    updatePercentWheelPosition();
+updateDisplay();
+
+updateDollarWheelPosition();
+updatePercentWheelPosition();
 
 });
 
