@@ -34,7 +34,7 @@ let currentDollarWheelMax = 50;
 // Settings Dropdown
 // ------------------------------
 
-for (let i = 0; i <= 50; i++) {
+for (let i = 0; i <= 100; i++) {
 
     const option = document.createElement("option");
 
@@ -60,7 +60,7 @@ function buildPercentWheel() {
     percentWheel.innerHTML = "";
 
 
-    for (let i = 0; i <= 50; i++) {
+    for (let i = 0; i <= 100; i++) {
 
         const item = document.createElement("div");
 
