@@ -1,6 +1,6 @@
 {
   "name": "Just The Tip",
-  "short_name": "Tip",
+  "short_name": "Just The Tip",
   "description": "A simple, offline tip calculator with a classic Mac OS 7 look.",
   "start_url": "./",
   "display": "standalone",
