@@ -24,7 +24,8 @@ let selectedPercent =
         : 20;
 
 let selectedAmount = 0;
-let updatingWheel = false;
+let updatingPercentWheel = false;
+let updatingDollarWheel = false;
 let activeWheel = "percent";
 
 let currentDollarWheelMax = 50;
@@ -78,7 +79,7 @@ function buildPercentWheel() {
 
         item.onclick = () => {
 
-            if (updatingWheel) return;
+            if (updatingPercentWheel) return;
 
             activeWheel = "percent";
             clearHighlight(dollarWheel);
@@ -144,10 +145,9 @@ function buildDollarWheel(maxAmount = 50) {
 
         item.onclick = () => {
 
-            if (updatingWheel) return;
+            if (updatingDollarWheel) return;
 
-            
-    activeWheel = "dollar";
+            activeWheel = "dollar";
             clearHighlight(percentWheel);
 
             selectedAmount = amount;
@@ -159,6 +159,7 @@ function buildDollarWheel(maxAmount = 50) {
 
             updateDisplay();
 
+            scrollWheelTo(dollarWheel, item, (v) => { updatingDollarWheel = v; });
             highlight(dollarWheel, cents / 25);
 
         };
@@ -168,6 +169,48 @@ function buildDollarWheel(maxAmount = 50) {
         dollarWheel.appendChild(item);
 
     }
+
+}
+
+
+
+// ------------------------------
+// Scroll helper
+// ------------------------------
+
+// Scrolls `targetItem` into view within `wheel`, holding the programmatic-
+// scroll flag (via setFlag) true until the animation genuinely finishes.
+// Uses the native 'scrollend' event where available; falls back to a
+// generous timeout for browsers without it, or for no-op scrolls (item
+// already centered) where scrollend never fires.
+function scrollWheelTo(wheel, targetItem, setFlag) {
+
+    if (!targetItem) return;
+
+    setFlag(true);
+
+    let settled = false;
+
+    const finish = () => {
+        if (settled) return;
+        settled = true;
+        setFlag(false);
+    };
+
+    if ("onscrollend" in window) {
+        wheel.addEventListener("scrollend", finish, { once: true });
+    }
+
+    // Safety net: guarantees the flag always clears even if scrollend
+    // doesn't fire (unsupported browser, or the item was already centered
+    // so no scrolling actually happened).
+    setTimeout(finish, 500);
+
+    targetItem.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest"
+    });
 
 }
 
@@ -298,27 +341,11 @@ function updatePercentWheelPosition() {
 
     if (!target) return;
 
-    updatingWheel = true;
-
-    target.scrollIntoView({
-
-        behavior:"smooth",
-
-        inline:"center",
-
-        block:"nearest"
-
-    });
+    scrollWheelTo(percentWheel, target, (v) => { updatingPercentWheel = v; });
 
    if (activeWheel === "percent") {
         highlight(percentWheel, selectedPercent);
     }
-
-    setTimeout(()=>{
-
-        updatingWheel = false;
-
-    },300);
 
 }
 
@@ -356,28 +383,15 @@ function updateDollarWheelPosition() {
     });
 
 
-    updatingWheel = true;
-
-    dollarWheel.children[closest]
-        .scrollIntoView({
-
-            behavior:"smooth",
-
-            inline:"center",
-
-            block:"nearest"
-
-        });
-
+    scrollWheelTo(
+        dollarWheel,
+        dollarWheel.children[closest],
+        (v) => { updatingDollarWheel = v; }
+    );
 
     if (activeWheel === "dollar") {
         highlight(dollarWheel, closest);
     }
-    setTimeout(()=>{
-
-        updatingWheel = false;
-
-    },300);
 
 }
 
@@ -386,6 +400,25 @@ function updateDollarWheelPosition() {
 // ------------------------------
 // Display
 // ------------------------------
+
+let wheelLabelsTimer = null;
+
+// The per-item wheel labels (100+ DOM nodes across both wheels) are more
+// expensive to refresh than the headline tip/total figures. Debouncing
+// them keeps rapid bill-amount typing from thrashing the DOM every
+// keystroke, while the numbers that matter most stay instant.
+function scheduleWheelLabelsUpdate() {
+
+    clearTimeout(wheelLabelsTimer);
+
+    wheelLabelsTimer = setTimeout(() => {
+
+        updatePercentWheelValues();
+        updateDollarWheelValues();
+
+    }, 120);
+
+}
 
 function updateDisplay() {
 
@@ -407,9 +440,7 @@ function updateDisplay() {
         `$${(bill + tip).toFixed(2)}`;
 
 
-    updatePercentWheelValues();
-
-    updateDollarWheelValues();
+    scheduleWheelLabelsUpdate();
 
 }
 
@@ -440,7 +471,7 @@ function clearHighlight(wheel) {
 // Wheel Scrolling
 // ------------------------------
 
-function watchWheel(wheel, callback) {
+function watchWheel(wheel, callback, isProgrammaticScroll) {
 
 
     let timer;
@@ -456,7 +487,7 @@ function watchWheel(wheel, callback) {
         timer=setTimeout(()=>{
 
 
-            if (updatingWheel)
+            if (isProgrammaticScroll())
                 return;
 
 
@@ -525,6 +556,13 @@ billInput.addEventListener("input", () => {
     // Keep only digits
     let digits = billInput.value.replace(/\D/g, "");
 
+    // Cap at 6 digits ($9,999.99). This keeps bills comfortably under the
+    // 10,000 cutoff in calculateAmountFromPercent, so the tip can never
+    // silently drop to $0.00 with no explanation.
+    if (digits.length > 6) {
+        digits = digits.slice(0, 6);
+    }
+
     // Empty field
     if (digits === "") {
         billInput.value = "";
@@ -533,6 +571,11 @@ billInput.addEventListener("input", () => {
         const amount = (parseInt(digits, 10) / 100).toFixed(2);
         billInput.value = amount;
     }
+
+    // This field always treats new input as appending to the cents value
+    // (like a calculator tape), so the cursor belongs at the end -
+    // pin it there explicitly rather than relying on the browser default.
+    billInput.setSelectionRange(billInput.value.length, billInput.value.length);
 
 rebuildDollarWheel();
 
@@ -547,6 +590,15 @@ updateDollarWheelPosition();
 updatePercentWheelPosition();
 
 });
+
+function moveBillCaretToEnd() {
+    requestAnimationFrame(() => {
+        billInput.setSelectionRange(billInput.value.length, billInput.value.length);
+    });
+}
+
+billInput.addEventListener("focus", moveBillCaretToEnd);
+billInput.addEventListener("click", moveBillCaretToEnd);
 
 billInput.addEventListener("keydown", (event) => {
 
@@ -588,7 +640,7 @@ watchWheel(percentWheel,(item, index)=>{
 
     highlight(percentWheel, index);
 
-});
+}, () => updatingPercentWheel);
 
 
 
@@ -612,7 +664,7 @@ watchWheel(dollarWheel,(item, index)=>{
 
     highlight(dollarWheel, index);
 
-});
+}, () => updatingDollarWheel);
 
 
 
