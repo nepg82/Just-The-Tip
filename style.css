@@ -209,7 +209,11 @@ label {
 
 
 
-/* Wheels */
+/* Tip Strip -- one shared scroll position, two stacked rows (percent on
+   top, dollar below), positioned along a common coordinate axis so a
+   percent tick and a dollar tick line up only when they represent the
+   same money amount. A fixed vertical line marks "currently selected"
+   at the center of the viewport; the strip scrolls underneath it. */
 
 .wheelSection {
 
@@ -219,21 +223,15 @@ label {
 
 
 
-.tipWheel {
+.tipStrip {
 
     position:relative;
 
-    display:flex;
-
     overflow-x:auto;
 
-    scroll-snap-type:x mandatory;
+    overflow-y:hidden;
 
-    gap:10px;
-
-    padding:6px;
-
-    margin-bottom:10px;
+    height:124px;
 
     background:#efefef;
 
@@ -249,7 +247,7 @@ label {
 
 
 
-.tipWheel::-webkit-scrollbar {
+.tipStrip::-webkit-scrollbar {
 
     display:none;
 
@@ -257,58 +255,105 @@ label {
 
 
 
-.tipWheel::before,
-.tipWheel::after {
+/* Fixed selection indicator -- lives on the scroll container itself
+   (not the scrolling content), so it never moves as the strip scrolls */
+.tipStrip::before {
 
     content:"";
 
-    flex:0 0 calc(50% - 45px);
+    position:absolute;
 
-}
+    left:50%;
 
+    top:0;
 
+    bottom:0;
 
-.tipItem {
-
-    flex:0 0 90px;
-
-    scroll-snap-align:center;
-
-    text-align:center;
-
-    background:#d9d9d9;
-
-    border:2px solid #000;
-
-    padding:8px 4px;
-
-}
-
-
-
-.tipItem.selected {
+    width:2px;
 
     background:var(--highlight);
 
-    color:#fff;
+    transform:translateX(-50%);
+
+    pointer-events:none;
+
+    z-index:2;
 
 }
 
 
 
-.tipPrimary {
+.stripContent {
 
-    font-size:22px;
+    position:relative;
 
-    margin-bottom:8px;
+    height:100%;
 
 }
 
 
 
-.tipSecondary {
+.stripRow {
 
-    font-size:14px;
+    position:absolute;
+
+    left:0;
+
+    height:62px;
+
+}
+
+
+
+.percentRow {
+
+    top:0;
+
+}
+
+
+
+.dollarRow {
+
+    top:62px;
+
+    border-top:2px solid #000;
+
+}
+
+
+
+.stripItem {
+
+    position:absolute;
+
+    top:0;
+
+    height:100%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    transform:translateX(-50%);
+
+    white-space:nowrap;
+
+    padding:0 4px;
+
+    font-size:18px;
+
+}
+
+
+
+.stripItem.selected {
+
+    color:var(--highlight);
+
+    font-weight:bold;
 
 }
 
