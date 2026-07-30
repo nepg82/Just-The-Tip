@@ -3,103 +3,67 @@
     --window: #d9d9d9;
     --title: #e6e6e6;
     --text: #000;
-    --secondary: #333;
     --highlight: #000080;
 }
 
 
 * {
-    box-sizing: border-box;
+    box-sizing:border-box;
 }
-
 
 @font-face {
-    font-family: "ChiKareGo";
-
-    src: url("fonts/ChiKareGo2.ttf")
+    font-family:"ChiKareGo";
+    src:url("fonts/ChiKareGo2.ttf")
         format("truetype");
-
-    font-weight: normal;
-    font-style: normal;
+    font-weight:normal;
+    font-style:normal;
 }
 
-
 body {
-
     margin:0;
-
     padding:20px;
-
     background:var(--bg);
-
     color:var(--text);
-
     font-family:
         "ChiKareGo",
         "Chicago",
         "Geneva",
         sans-serif;
-
     -webkit-font-smoothing:none;
-
     font-size:18px;
-
     line-height:1.2;
-
 }
-
-
 
 /* Main Window */
 
 .window {
-
     max-width:420px;
-
     margin:0 auto;
-
     background:var(--window);
-
     border:2px solid #000;
-
     box-shadow:
         inset 2px 2px 0 #fff,
         inset -2px -2px 0 #7f7f7f;
-
 }
-
-
 
 /* Title Bar */
 
 .titlebar {
-
     background:var(--title);
-
     border-bottom:4px solid #000;
-
     padding:6px 10px;
-
     display:flex;
-
     align-items:center;
-
-    gap:12px;
-
+    justify-content:center;
     font-size:24px;
-
 }
-
 
 .titlebar::before,
 .titlebar::after {
-
     content:"";
-
     flex:1;
-
     height:22px;
-
+    margin:0 12px;
     background-image:
         repeating-linear-gradient(
             to bottom,
@@ -108,399 +72,185 @@ body {
             transparent 2px,
             transparent 5px
         );
-
 }
-
-
-.titlebar span {
-
-    text-align:center;
-
-}
-
-
-
-.titlebar button {
-
-    position:absolute;
-
-    margin-left:350px;
-
-    width:32px;
-
-    height:28px;
-
-    font-family:inherit;
-
-    font-size:18px;
-
-    background:#d9d9d9;
-
-    border:2px solid #000;
-
-    box-shadow:
-        inset 2px 2px 0 #fff,
-        inset -2px -2px 0 #7f7f7f;
-
-}
-
-
 
 /* Content */
 
 main {
-
     padding:20px;
-    padding-top: 10px;
-
+    padding-top:10px;
 }
-
-
 
 label {
-
     display:block;
-
     margin-bottom:8px;
-
 }
 
-
-
-/* Bill Entry */
+/* Bill Input */
 
 .moneyInput {
-
     display:flex;
-
     align-items:center;
-
     background:#fff;
-
     padding:8px;
-
-    margin-bottom:12px;
-
+    margin-bottom:16px;
     border:2px solid #000;
-
     box-shadow:
         inset 2px 2px 0 #7f7f7f,
         inset -2px -2px 0 #fff;
-
     font-size:28px;
-
 }
-
-
 
 .moneyInput input {
-
     width:100%;
-
     border:0;
-
     outline:0;
-
     background:none;
-
     font:inherit;
-
 }
 
-
-
-/* Tip Strip -- one shared scroll position, two stacked rows (percent on
-   top, dollar below), positioned along a common coordinate axis so a
-   percent tick and a dollar tick line up only when they represent the
-   same money amount. A fixed vertical line marks "currently selected"
-   at the center of the viewport; the strip scrolls underneath it. */
+/* Wheel */
 
 .wheelSection {
-
     margin-bottom:20px;
-
 }
 
-
-
-.tipStrip {
-
+.tipWindow {
     position:relative;
-
-    overflow-x:auto;
-
-    overflow-y:hidden;
-
-    height:124px;
-
+    z-index:3;
+    width:170px;
+    margin:0 auto -8px;
+    padding:8px;
+    text-align:center;
     background:#efefef;
-
     border:2px solid #000;
-
     box-shadow:
         inset 2px 2px 0 #7f7f7f,
         inset -2px -2px 0 #fff;
-
-    scrollbar-width:none;
-
 }
 
+#tipAmount {
+    font-size:32px;
+}
 
+#tipPercent {
+    font-size:18px;
+}
+
+/* Scrollable wheel window */
+
+.tipStrip {
+    position:relative;
+    overflow-x:auto;
+    overflow-y:hidden;
+    height:90px;
+    background:#efefef;
+    border:2px solid #000;
+    box-shadow:
+        inset 2px 2px 0 #7f7f7f,
+        inset -2px -2px 0 #fff;
+    scrollbar-width:none;
+}
 
 .tipStrip::-webkit-scrollbar {
-
     display:none;
-
 }
 
+/* Center selection line */
 
-
-/* Fixed selection indicator -- lives on the scroll container itself
-   (not the scrolling content), so it never moves as the strip scrolls */
 .tipStrip::before {
-
     content:"";
-
     position:absolute;
-
     left:50%;
-
     top:0;
-
     bottom:0;
-
     width:2px;
-
     background:var(--highlight);
-
     transform:translateX(-50%);
-
-    pointer-events:none;
-
-    z-index:2;
-
+    z-index:5;
 }
 
-
+/* Generated wheel content */
 
 .stripContent {
-
     position:relative;
-
     height:100%;
-
 }
 
+/* Individual dollar ticks */
 
-
-.stripRow {
-
+.tick {
     position:absolute;
-
-    left:0;
-
-    height:62px;
-
-}
-
-
-
-.percentRow {
-
     top:0;
-
-}
-
-
-
-.dollarRow {
-
-    top:62px;
-
-    border-top:2px solid #000;
-
-}
-
-
-
-.stripItem {
-
-    position:absolute;
-
-    top:0;
-
+    width:70px;
     height:100%;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
     transform:translateX(-50%);
-
+    text-align:center;
     white-space:nowrap;
-
-    padding:0 4px;
-
-    font-size:18px;
-
 }
 
+/* Percent above */
 
-
-.stripItem.selected {
-
-    color:var(--highlight);
-
-    font-weight:bold;
-
+.tick .percent {
+    display:block;
+    margin-top:10px;
+    font-size:16px;
 }
 
+/* Dollar below */
 
+.tick .dollar {
+    display:block;
+    margin-top:8px;
+    font-size:20px;
+}
+
+.tick::after {
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:50%;
+    width:2px;
+    height:18px;
+    background:#000;
+    transform:translateX(-50%);
+}
 
 /* Results */
 
 .results {
-
     background:#efefef;
-
     padding:12px;
-
     border:2px solid #000;
-
     box-shadow:
         inset 2px 2px 0 #7f7f7f,
         inset -2px -2px 0 #fff;
-
 }
-
-
 
 .resultRow {
-
     display:flex;
-
     justify-content:space-between;
-
     font-size:28px;
-
 }
-
-
 
 .total {
-
     margin-top:10px;
-
     padding-top:10px;
-
     border-top:2px solid #000;
-
 }
-
-
-
-/* Dialog */
-
-dialog {
-
-    background:var(--window);
-
-    border:2px solid #000;
-
-    padding:20px;
-
-    font-family:inherit;
-
-    box-shadow:
-        inset 2px 2px 0 #fff,
-        inset -2px -2px 0 #7f7f7f;
-
-}
-
-
-
-dialog h2 {
-
-    margin-top:0;
-
-    font-weight:normal;
-
-}
-
-
-
-dialog select {
-
-    width:100%;
-
-    font-family:inherit;
-
-    font-size:18px;
-
-    margin:10px 0 20px;
-
-}
-
-
-
-menu {
-
-    display:flex;
-
-    justify-content:flex-end;
-
-    gap:10px;
-
-}
-
-
-
-menu button {
-
-    font-family:inherit;
-
-    font-size:18px;
-
-    padding:6px 18px;
-
-    background:#d9d9d9;
-
-    border:2px solid #000;
-
-    box-shadow:
-        inset 2px 2px 0 #fff,
-        inset -2px -2px 0 #7f7f7f;
-
-}
-
-
 
 /* Mobile */
 
 @media(max-width:600px) {
-
-
     body {
-
         padding:8px;
-
     }
-
 
     main {
-
         padding:8px;
-
     }
-
 
     .titlebar {
-
         font-size:20px;
-
     }
-
-
 }
