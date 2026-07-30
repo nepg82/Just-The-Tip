@@ -180,6 +180,19 @@ function handleScroll() {
             0,
             bill
         );
+
+    const cents = Math.round(amount * 100);
+
+    const lowerQuarter = Math.floor(cents / 25) * 25;
+    const upperQuarter = Math.ceil(cents / 25) * 25;
+
+    if (Math.abs(cents - lowerQuarter) <= 2) {
+        amount = lowerQuarter / 100;
+    }
+    else if (Math.abs(upperQuarter - cents) <= 2) {
+        amount = upperQuarter / 100;
+    }
+    
     setTip(amount);
 }
 
