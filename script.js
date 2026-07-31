@@ -9,6 +9,8 @@ const tipPercent = document.getElementById("tipPercent");
 const tipValue = document.getElementById("tipValue");
 const totalValue = document.getElementById("totalValue");
 
+const tipDecrease = document.getElementById("tipDecrease");
+const tipIncrease = document.getElementById("tipIncrease");
 
 // --------------------------------------------------
 // Configuration
@@ -240,6 +242,18 @@ billInput.addEventListener(
         }
     }
 );
+
+// --------------------------------------------------
+// Penny nudge buttons
+// --------------------------------------------------
+
+tipDecrease.addEventListener("click", () => {
+    setTip(selectedTip - 0.01, true);
+});
+
+tipIncrease.addEventListener("click", () => {
+    setTip(selectedTip + 0.01, true);
+});
 
 // --------------------------------------------------
 // Startup
