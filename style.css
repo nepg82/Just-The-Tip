@@ -158,8 +158,7 @@ label {
 
 /* Center selection line */
 
-.tipStrip::before {
-    content:"";
+.centerLine {
     position:absolute;
     left:50%;
     top:0;
@@ -168,6 +167,11 @@ label {
     background:var(--highlight);
     transform:translateX(-50%);
     z-index:5;
+    pointer-events:none;
+}
+
+.tipStripWrapper {
+    position:relative;
 }
 
 /* Generated wheel content */
