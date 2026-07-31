@@ -49,13 +49,19 @@
             </label>
 
             <!-- Current selected tip amount -->
-            <div class="tipWindow">
-                <div id="tipAmount">
-                    $0.00
+            <div class="tipAdjustRow">
+                <button id="tipDecrease" class="tipAdjustBtn" aria-label="Decrease tip by one cent">−</button>
+
+                <div class="tipWindow">
+                    <div id="tipAmount">
+                        $0.00
+                    </div>
+                    <div id="tipPercent">
+                        0%
+                    </div>
                 </div>
-                <div id="tipPercent">
-                    0%
-                </div>
+
+                <button id="tipIncrease" class="tipAdjustBtn" aria-label="Increase tip by one cent">+</button>
             </div>
 
             <!-- Scrolling wheel -->
