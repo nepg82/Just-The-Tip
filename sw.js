@@ -1,4 +1,4 @@
-const CACHE_NAME = "just-the-tip-v7.0.2";
+const CACHE_NAME = "just-the-tip-v2.0.1";
 
 const FILES_TO_CACHE = [
     "./",
